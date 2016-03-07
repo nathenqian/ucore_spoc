@@ -1,12 +1,13 @@
 #include <cstdio>
 #include <string>
 #include <iostream>
+#include <vector>
 using namespace std;
 class PMMManager {
 public:
-    virtual void test();
-    virtual void *pmm_malloc(int size);
-    virtual void pmm_free(void *ptr);
+    virtual void test() = 0;
+    virtual void *pmm_malloc(int size) = 0;
+    virtual void pmm_free(long long *ptr) = 0;
     string name;
     void print_name() {
         cout << "now PMMManager is " << name << endl;
@@ -24,15 +25,18 @@ public:
 
 class PMMManagerFirst : public PMMManager{
 public:
-    long long *base;
+    long long *base, *memory_block_start;
     // size of byte
     const int reserved_size = 24;
     PMMManagerFirst(int init_memory_size) {
+        init_memory_size = upper_round(init_memory_size, 4);
+        cout << "init memory " << init_memory_size << " Byte" << endl;
         long long *block_memory_base = (long long *)malloc(init_memory_size);
+        memory_block_start = block_memory_base;
         block_memory_base = block_memory_base + 3;
 
         base = (long long *)malloc(24);
-
+        base = base + 3;
         SETSIZE(block_memory_base, init_memory_size - 4);
         SETPREV(block_memory_base, base);
         SETNEXT(block_memory_base, base);
@@ -41,8 +45,52 @@ public:
         SETNEXT(base, block_memory_base);
     }
 
-    void test() {
+    void test_main(int id, int n, int *query_size, int *opt_type, int *result) {
+        cout << "start test"<< id << endl;
+        vector<char *> query_ans;
 
+        for (int i = 0; i < n; i ++) {
+            cout << "-------------------------------operation " << i << "-------------------------------" << endl;
+            if (opt_type[i] == -1) {
+                char *ans = (char *)pmm_malloc(query_size[i]);
+                cout << "try to allocate size = " << query_size[i] << endl;
+                if (ans != 0) {
+                    cout << "   allocate offset " << (long long)ans - (long long)memory_block_start << endl;
+                } else  {
+                    cout << "cant allocate" << endl;
+                }
+                query_ans.push_back(ans);
+            } else {
+                cout << "try to free size = " << query_size[opt_type[i]] << endl;
+                pmm_free((long long *)query_ans[opt_type[i]]);
+            }
+            print_memory_block();
+        }
+    }
+
+    void print_memory_block() {
+        cout << "print in order memory" << endl << "    ";
+        long long *ptr = GETNEXT(base);
+        for (; ptr != base; ptr = GETNEXT(ptr)) {
+            cout << "[" << (long long)ptr - (long long)memory_block_start - reserved_size << " , " << 
+                (long long)ptr - (long long)memory_block_start - reserved_size + GETSIZE(ptr) << ")  ";
+        }
+        cout << endl;
+        cout << "print reversed memory" << endl << "    ";
+        ptr = GETPREV(base);
+        for (; ptr != base; ptr = GETPREV(ptr)) {
+            cout << "[" << (long long)ptr - (long long)memory_block_start - reserved_size << " , " << 
+                (long long)ptr - (long long)memory_block_start - reserved_size + GETSIZE(ptr) << ")  ";
+        }
+        cout << endl;
+    }
+    void test() {
+        cout << "start test" << endl;
+        int n = 5;
+        int query_size[] = {45, 55, 55, 0, 50};
+        int opt_type[] = {-1, -1, -1, 0, -1};
+        int result[] = {0, 1, -1, -1, 2};
+        test_main(1, n, query_size, opt_type, result);
     }
 
     const int align = 4;
@@ -55,8 +103,8 @@ public:
     void add_next(long long *base, long long *block) {
         SETNEXT(block, GETNEXT(base));
         SETPREV(block, base);
-        SETNEXT(base, block);
         SETPREV(GETNEXT(base), block);
+        SETNEXT(base, block);
     }
 
     void del(long long *base) {
@@ -74,13 +122,17 @@ public:
                     // can split into two memory blocks.
                     // one reserved for query, one is smaller.
                     long long *smaller_block = ptr + real_size / 8;
+
+                    SETSIZE(smaller_block, GETSIZE(ptr) - real_size);
                     SETNEXT(GETPREV(ptr), smaller_block);
                     SETPREV(GETNEXT(ptr), smaller_block);
                     SETPREV(smaller_block, GETPREV(ptr));
                     SETNEXT(smaller_block, GETNEXT(ptr));
+                    SETSIZE(ptr, real_size);
                     return ptr;
                 } else {
                     del(ptr);
+                    SETSIZE(ptr, real_size);
                     return ptr;
                 }
                 break;
@@ -117,6 +169,7 @@ public:
             merge(ptr);
         } else {
             // ptr is smaller
+
             add_next(base, ptr);
             merge(ptr);
         }
@@ -124,5 +177,6 @@ public:
 };
 
 int main() {
-
+    PMMManagerFirst *a = new PMMManagerFirst(230);
+    a->test();
 }
