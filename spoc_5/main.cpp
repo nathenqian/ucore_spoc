@@ -83,6 +83,7 @@ public:
     void print_memory_block() {
         cout << "print in order memory" << endl << "    ";
         long long *ptr = GETNEXT(base);
+        // 链表打印的形式为每个空闲内存块的地址区间，左闭右开
         for (; ptr != base; ptr = GETNEXT(ptr)) {
             cout << "[" << (long long)ptr - (long long)memory_block_start - reserved_size << " , " << 
                 (long long)ptr - (long long)memory_block_start - reserved_size + GETSIZE(ptr) << ")  ";
