@@ -25,5 +25,5 @@ class PMMManager:
     def __init__(self, memorys):
         self.list_head = ListEntry((0, 0))
         for memory_block in memorys:
-            self.list.prev.add_next(memory)
+            self.list_head.prev.add_next(memory)
     def 
