@@ -3,6 +3,99 @@
 #include <iostream>
 #include <vector>
 using namespace std;
+/*
+    本次作业，实现的是最先匹配。
+    问题：如何表示空闲块？ 如何表示空闲块列表？ 
+    我们采用的是先预先分配一块大的内存用来进行模拟，使用链表进行查找。每次分配和释放的时间复杂度，都是链表的长度O(L)级别。
+    
+    问题：在一次malloc后，如果根据某种顺序查找符合malloc要求的空闲块？如何把一个空闲块改变成另外一个空闲块，或消除这个空闲块？如何更新空闲块列表？
+    我们顺序访问链表中的内存块，越前面的内存块的地址越小。找到可以用的内存块和，将其分裂成两块，一块进行分配，从链表中删除，一块插入链表等待下次分配。
+
+    问题：在一次free后，如何把已使用块转变成空闲块，并按照某种顺序（起始地址，块大小）插入到空闲块列表中？考虑需要合并相邻空闲块，形成更大的空闲块？
+    我们插入分配的内存块到链表中，根据其实地址的大小，然后进行合并。
+    合并的方法是找到他之前的内存块，然后不停的看看他和NEXT的是不是可以连在一起。
+
+    问题：如果考虑地址对齐（比如按照4字节对齐），应该如何设计？
+    我们考虑了这一点，所有分配的内存都是按照4字节对齐的。设计的时候只需要在最开始分配的模拟用的大内存对齐，并且每次分配都进行4对齐即可（即分配的内存可能比需要的大）。
+
+    问题：如果考虑空闲/使用块列表组织中有部分元数据，比如表示链接信息，如何给malloc返回有效可用的空闲块地址而不破坏元数据信息？
+    我们在本次实验中特别考虑了这一点。我们的内存块中存储着这块内存块的大小，NEXT和PREV指针。
+
+    普通实现的方法。
+    struct entry {
+        int size;
+        entry *next;
+        entry *prev;
+    }
+
+    我们实现的方法。
+    内存块中的头24个Byte是元数据，分别是size，next，和prev的数据。
+    真正分配的时候，我们将内存块的起始地址+24Byte作为真正的地址进行分配给用户。
+    free的时候直接从内存块里面获得他的尺寸大小。
+
+    这样在一定意义上，我们模拟了元数据的操作。
+
+    下面是一个测试的输出，经过验证是正确的。
+*/
+/*
+init memory 256 Byte
+start test
+start test1
+-------------------------------operation 0-------------------------------
+real size 72
+try to allocate size = 45
+   allocate offset 24
+print in order memory
+    [72 , 256)
+print reversed memory
+    [72 , 256)
+-------------------------------operation 1-------------------------------
+real size 64
+try to allocate size = 37
+   allocate offset 96
+print in order memory
+    [136 , 256)
+print reversed memory
+    [136 , 256)
+-------------------------------operation 2-------------------------------
+real size 80
+try to allocate size = 55
+   allocate offset 160
+print in order memory
+    [216 , 256)
+print reversed memory
+    [216 , 256)
+-------------------------------operation 3-------------------------------
+try to free size = 37
+print in order memory
+    [72 , 136)  [216 , 256)
+print reversed memory
+    [216 , 256)  [72 , 136)
+-------------------------------operation 4-------------------------------
+real size 76
+try to allocate size = 50
+cannot allocate
+print in order memory
+    [72 , 136)  [216 , 256)
+print reversed memory
+    [216 , 256)  [72 , 136)
+-------------------------------operation 5-------------------------------
+try to free size = 45
+print in order memory
+    [0 , 136)  [216 , 256)
+print reversed memory
+    [216 , 256)  [0 , 136)
+-------------------------------operation 6-------------------------------
+real size 112
+try to allocate size = 85
+   allocate offset 24
+print in order memory
+    [112 , 136)  [216 , 256)
+print reversed memory
+    [216 , 256)  [112 , 136)
+*/
+
+// 接口类型，只需要实现接口即可以实现功能
 class PMMManager {
 public:
     virtual void test() = 0;
