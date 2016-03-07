@@ -14,6 +14,7 @@ public:
     }
 };
 
+// 每个内存块头部的定义：本块的大小，指向前一块的指针，指向后一块的指针
 #define SETSIZE(base, value) *(((long long *)base) - 1) = ((long long)value)
 #define SETPREV(base, value) *(((long long *)base) - 2) = ((long long)value)
 #define SETNEXT(base, value) *(((long long *)base) - 3) = ((long long)value)
@@ -25,22 +26,31 @@ public:
 
 class PMMManagerFirst : public PMMManager{
 public:
+    // 使用双向链表维护每一个内存块的头部
+    // memory_block_start是内存块中地址最低的一块的地址
+    // base只是一个区域头部结构，起到连接双向链表的首尾，使之成为循环链表的作用
     long long *base, *memory_block_start;
-    // size of byte
-    const int reserved_size = 24;
+
+    static const int reserved_size = 24;        // 每个内存区域的头部长度为24字节
+    static const int align = 4;                 // 4字节对齐
+
     PMMManagerFirst(int init_memory_size) {
-        init_memory_size = upper_round(init_memory_size, 4);
+        init_memory_size = upper_round(init_memory_size + reserved_size, align);    // 可分配区域的总大小
         cout << "init memory " << init_memory_size << " Byte" << endl;
+        // 初始化指针
         long long *block_memory_base = (long long *)malloc(init_memory_size);
         memory_block_start = block_memory_base;
         block_memory_base = block_memory_base + 3;
 
-        base = (long long *)malloc(24);
+        base = (long long *)malloc(reserved_size);
         base = base + 3;
-        SETSIZE(block_memory_base, init_memory_size - 4);
+        // 连接成为双向循环链表
+        // 每一块的size包块这一块的24字节头部
+        SETSIZE(block_memory_base, init_memory_size);
         SETPREV(block_memory_base, base);
         SETNEXT(block_memory_base, base);
 
+        SETSIZE(base, reserved_size);
         SETPREV(base, block_memory_base);
         SETNEXT(base, block_memory_base);
     }
@@ -84,6 +94,7 @@ public:
         }
         cout << endl;
     }
+
     void test() {
         cout << "start test" << endl;
         int n = 5;
@@ -93,7 +104,6 @@ public:
         test_main(1, n, query_size, opt_type, result);
     }
 
-    const int align = 4;
     int upper_round(int size, int mod) {
         if (size % mod == 0)
             return size;
@@ -119,10 +129,10 @@ public:
             int block_size = GETSIZE(ptr);
             if (block_size >= real_size) {
                 if (block_size >= real_size + reserved_size) {
-                    // can split into two memory blocks.
-                    // one reserved for query, one is smaller.
-                    long long *smaller_block = ptr + real_size / 8;
-
+                    // 则空间足够分成两个块
+                    // 前半块是分配的空间，后半块是碎片，依然空闲
+                    long long *smaller_block = ptr + real_size / sizeof(long long); // 后半块的开头
+                    // 把分配出去的块从空闲表中拆除
                     SETSIZE(smaller_block, GETSIZE(ptr) - real_size);
                     SETNEXT(GETPREV(ptr), smaller_block);
                     SETPREV(GETNEXT(ptr), smaller_block);
@@ -131,6 +141,7 @@ public:
                     SETSIZE(ptr, real_size);
                     return ptr;
                 } else {
+                    // 空间不够分成两块，直接拆除
                     del(ptr);
                     SETSIZE(ptr, real_size);
                     return ptr;
@@ -156,7 +167,7 @@ public:
 
     void pmm_free(long long *ptr) {
         long long *temp = GETNEXT(base), *smaller = 0;
-        for (; temp != base; temp = GETNEXT(base)) {
+        for (; temp != base; temp = GETNEXT(temp)) {
             if (temp < ptr) {
                 smaller = temp;
             } else 
