@@ -56,7 +56,7 @@ public:
         SETNEXT(base, block_memory_base);
     }
 
-    void test_main(int id, int n, int *query_size, int *opt_type, int *result) {
+    void test_main(int id, int n, int *query_size, int *opt_type) {
         cout << "start test"<< id << endl;
         vector<char *> query_ans;
 
@@ -68,7 +68,7 @@ public:
                 if (ans != 0) {
                     cout << "   allocate offset " << (long long)ans - (long long)memory_block_start << endl;
                 } else  {
-                    cout << "cant allocate" << endl;
+                    cout << "cannot allocate" << endl;
                 }
                 query_ans.push_back(ans);
             } else {
@@ -78,7 +78,8 @@ public:
             print_memory_block();
         }
     }
-
+    // 作为检查，双向各遍历一遍链表
+    // 打印每一个空闲区域的起止地址，是包括头部的24字节的
     void print_memory_block() {
         cout << "print in order memory" << endl << "    ";
         long long *ptr = GETNEXT(base);
@@ -99,10 +100,9 @@ public:
     void test() {
         cout << "start test" << endl;
         int n = 5;
-        int query_size[] = {45, 55, 55, 0, 50};
-        int opt_type[] = {-1, -1, -1, 0, -1};
-        int result[] = {0, 1, -1, -1, 2};
-        test_main(1, n, query_size, opt_type, result);
+        int query_size[] = {45, 55, 55, 0, 50};     // 分配的空间大小
+        int opt_type[] = {-1, -1, -1, 0, -1};       // 操作类型：-1为分配，其余为释放的指针编号。先分配的指针编号为0，顺次递增。 
+        test_main(1, n, query_size, opt_type);
     }
 
     int upper_round(int size, int mod) {
