@@ -99,9 +99,13 @@ public:
 
     void test() {
         cout << "start test" << endl;
-        int n = 5;
-        int query_size[] = {45, 55, 55, 0, 50};     // 分配的空间大小
-        int opt_type[] = {-1, -1, -1, 0, -1};       // 操作类型：-1为分配，其余为释放的指针编号。先分配的指针编号为0，顺次递增。 
+        // 测试设计:
+        // 首先分配三块，他们的大小都会被填充为4字节对齐
+        // 释放中间一小块后，空间不足以分配出50字节
+        // 再次释放一块后，能够自动合并，使得能够分配出更大的区域
+        int n = 7;                                  // 测试中的操作数
+        int query_size[] = {45, 37, 55, 0, 50, 0, 85};     // 分配的空间大小
+        int opt_type[] = {-1, -1, -1, 1, -1, 0, -1};       // 操作类型：-1为分配，其余为释放的指针编号。先分配的指针编号为0，顺次递增。 
         test_main(1, n, query_size, opt_type);
     }
 
@@ -126,6 +130,7 @@ public:
     void *pmm_malloc(int size) {
         long long *ptr = GETNEXT(base);
         int real_size = upper_round(size + reserved_size, align);
+        cout << "real size " << real_size << endl;
         for (; ptr != base; ptr = GETNEXT(ptr)) {
             int block_size = GETSIZE(ptr);
             if (block_size >= real_size) {
@@ -157,8 +162,9 @@ public:
         char *ptr = (char *)ptr__;
 
         while (GETNEXT(ptr) != base) {
-            char *end = ptr - reserved_size + GETSIZE(ptr);
-            if (end == ((char *)GETNEXT(ptr))) {
+            // 判断本块的下一块是不是空闲链表中的下一块，如果是，则可以直接合并
+            char *next_start = ptr + GETSIZE(ptr);
+            if (next_start == ((char *)GETNEXT(ptr))) {
                 SETSIZE(ptr, GETSIZE(ptr) + GETSIZE(GETNEXT(ptr)));
                 del(GETNEXT(ptr));
             } else
