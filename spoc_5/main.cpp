@@ -15,6 +15,7 @@ public:
 };
 
 // 每个内存块头部的定义：本块的大小，指向前一块的指针，指向后一块的指针
+// base是本块数据的开始，头部信息存在base之前
 #define SETSIZE(base, value) *(((long long *)base) - 1) = ((long long)value)
 #define SETPREV(base, value) *(((long long *)base) - 2) = ((long long)value)
 #define SETNEXT(base, value) *(((long long *)base) - 3) = ((long long)value)
@@ -109,14 +110,14 @@ public:
             return size;
         return size - size % mod + mod;
     }
-
+    // 本函数在base后插入结点block
     void add_next(long long *base, long long *block) {
         SETNEXT(block, GETNEXT(base));
         SETPREV(block, base);
         SETPREV(GETNEXT(base), block);
         SETNEXT(base, block);
     }
-
+    // 本函数删除base结点
     void del(long long *base) {
         SETNEXT(GETPREV(base), GETNEXT(base));
         SETPREV(GETNEXT(base), GETPREV(base));
@@ -151,7 +152,7 @@ public:
         }
         return 0;
     }
-
+    // 向后合并
     void merge(long long *ptr__) {
         char *ptr = (char *)ptr__;
 
@@ -167,6 +168,7 @@ public:
 
     void pmm_free(long long *ptr) {
         long long *temp = GETNEXT(base), *smaller = 0;
+        // 寻找比被释放的ptr小的最大的指针smaller
         for (; temp != base; temp = GETNEXT(temp)) {
             if (temp < ptr) {
                 smaller = temp;
@@ -174,13 +176,13 @@ public:
                 break;
         }
         if (smaller != 0) {
-            // can find one smaller
+            // 释放的指针前面还有一块，则插入链表
             add_next(smaller, ptr);
+            // merge是向后合并。所以要找到前一块，并尝试merge前一块：如果相邻则合并成功
             merge(smaller);
             merge(ptr);
         } else {
-            // ptr is smaller
-
+            // 释放的指针作为头指针
             add_next(base, ptr);
             merge(ptr);
         }
