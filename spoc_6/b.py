@@ -129,19 +129,19 @@ lis = [[0x7f,0x7f,0x7f,0x7f,0x7f,0x7f,0xb2,0x7f,0x7f,0x7f,0x7f,0x7f,0x7f,0x7f,0x
 
 
 addr = 0x69dc
-print "virtual address is " + str(addr)
+print "virtual address is " + str(hex(addr))
 index_dir = 0x11;
 pde = 0b111110000000000
 pde_result = lis[index_dir][(addr & pde) >> 10]
 print "    pde index : " + str(hex((addr & pde) >> 10)) + \
-    "   pde value : (" + str(hex(pde_result & 0b01111111)) + \
+    "   pde content : (value = " + str(hex(pde_result & 0b01111111)) + \
     " valid = " + str((pde_result & 0b10000000) >> 7) + ")"
 if ((pde_result & 0b10000000) >> 7 == 1):
     pte = 0b1111100000
     pte_addr = ((pde_result & 0b01111111) << 5) + ((addr & pte) >> 5)
     pte_result = lis[pte_addr >> 5][pte_addr & 0b11111]
     print "        ptd index : " + str(hex(((addr & pte) >> 5))) + \
-        "   pte value : (" + str(hex(pte_result & 0b01111111)) + \
+        "   pte content : (value = " + str(hex(pte_result & 0b01111111)) + \
         " valid = " + str((pte_result & 0b10000000) >> 7) + ")"
     if ((pte_result & 0b10000000) >> 7) == 1:
         print "            translate to physical addr : " + \
