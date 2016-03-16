@@ -33,21 +33,18 @@ if __name__ == "__main__":
         print "    --> pte index : " + str(hex(page_table_index)) + \
             "   pte contents : (valid = " + str(page_frame_valid) + \
             " pfn = " + str(hex(page_frame_number)) + ")"
-
+        offset = virtual_address & 0b11111
         if (page_frame_valid == 0):
-            # print "      --> Fault (page table entry not valid)"
-            offset = virtual_address & 0b11111
-            page_table_entry = disk[0x6c][page_table_index]
-            page_frame_number = page_table_entry & 0b01111111
             if page_frame_number == 0x7F:
                 print "      --> cant find address"
-            else:
-                physical_address = (page_frame_number << 5) + offset     # 物理地址为页号加偏移量
-                print "      --> Translates to disk address : " + \
-                    hex(physical_address) + \
-                    " --> value : " + str(hex(disk[page_frame_number][offset]))
+                sys.exit(0)
+            page_table_entry = disk[0x6c][page_table_index]
+            page_frame_number = page_table_entry & 0b01111111
+            physical_address = (page_frame_number << 5) + offset     # 物理地址为页号加偏移量
+            print "      --> Translates to disk address : " + \
+                hex(physical_address) + \
+                " --> value : " + str(hex(disk[page_frame_number][offset]))
         else:
-            offset = virtual_address & 0b11111
             physical_address = (page_frame_number << 5) + offset     # 物理地址为页号加偏移量
             print "      --> Translates to physical address : " + \
                 hex(physical_address) + \
