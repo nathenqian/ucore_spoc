@@ -38,9 +38,9 @@ if __name__ == "__main__":
             if page_frame_number == 0x7F:
                 print "      --> cant find address"
                 sys.exit(0)
-            page_table_entry = disk[page_frame_number][page_table_index]
-            page_frame_number = page_table_entry & 0b01111111
             physical_address = (page_frame_number << 5) + offset     # 物理地址为页号加偏移量
+            # page_table_entry = disk[page_frame_number][page_table_index]
+            # page_frame_number = page_table_entry & 0b01111111
             print "      --> Translates to disk address : " + \
                 hex(physical_address) + \
                 " --> value : " + str(hex(disk[page_frame_number][offset]))
