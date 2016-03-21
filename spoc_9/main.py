@@ -3,12 +3,16 @@ from optparse import OptionParser
 
 parser = OptionParser()
 # 一个选项设定窗口大小
+parser.add_option('-p', '--test_page', default='0,1,2,1,0,2,3,1,3', help='tets pages',  action='store', type='string', dest='test_pages')
 parser.add_option('-t', '--delta_time', default='3', help='delta time',  action='store', type='int', dest='delta_t')
 
 (options, args) = parser.parse_args()
 delta_t = options.delta_t
+test_pages = (options.test_pages).split(',')
 
-test_list = [0, 1, 2, 1, 0, 2, 3, 1, 3]
+test_list = []
+for page in test_pages:
+    test_list.append(int(page))
 # delta_t = 3
 memory_page = {}
 total_miss = 0
