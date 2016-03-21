@@ -1,3 +1,4 @@
+# coding:utf-8
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -34,15 +35,17 @@ def add_page(memory, index):
     memory[index] += 1
 
 for t in range(0, len(test_list)):
-    # 找到刚刚失效的位置
-    last_index = t - delta_t
-    # 如果该位置存在，删掉它
-    if last_index >= 0:
-        remove_page(memory_page, test_list[last_index])
+    # 判断该页是否存在
     if has_page(memory_page, test_list[t]):
         print "hit page %s" % (str(test_list[t]))
     else:
         total_miss += 1
         print "can't hit page %s total miss = %s" % (str(test_list[t]), str(total_miss))
-    # 访问，即在窗口中为该页加1
+    # 更新窗口，即在窗口中为该页加1
     add_page(memory_page, test_list[t])
+
+    # 找到刚刚失效的位置
+    last_index = t - delta_t
+    # 如果该位置存在，删掉它
+    if last_index >= 0:
+        remove_page(memory_page, test_list[last_index])
