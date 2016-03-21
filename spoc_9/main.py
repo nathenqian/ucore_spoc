@@ -1,6 +1,7 @@
 from optparse import OptionParser
 
 parser = OptionParser()
+# 一个选项设定窗口大小
 parser.add_option('-t', '--delta_time', default='3', help='delta time',  action='store', type='int', dest='delta_t')
 
 (options, args) = parser.parse_args()
