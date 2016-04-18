@@ -52,17 +52,15 @@ else:
         print '  Job', job[0], '( length = ' + str(job[1]) + ' )'
 print '\n'
 
+if options.policy == 'SJF':
+    joblist = sorted(joblist, key = lambda x:x[1])
+
 if options.solve == True:
     print '** Solutions **\n'
-    if options.policy == 'SJF':
-        #YOUR CODE
-        pass
         
-    if options.policy == 'FIFO':
+    if options.policy == 'FIFO' or options.policy == 'SJF':
         thetime = 0
         print 'Execution trace:'
-        #YOUR CODE
-         
         print '\nFinal statistics:'
         t     = 0.0
         count = 0
