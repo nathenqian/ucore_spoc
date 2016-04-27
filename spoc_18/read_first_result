@@ -1,0 +1,28 @@
+reader_0            reader_1            reader_2            writer_0            writer_1            writer_2
+init
+lock
+start reading
+                                                            init
+                                                            lock
+                                                            wait
+                    init
+                    lock
+                    start reading
+                                                                                init
+                                                                                lock
+                                                                                wait
+                    end reading
+                                                                                                    init
+                                                                                                    lock
+                                                                                                    wait
+                                        init
+                                        lock
+                                        start reading
+end reading
+                                        end reading
+                                                            start writing
+                                                            end writing
+                                                                                start writing
+                                                                                end writing
+                                                                                                    start writing
+                                                                                                    end writing
