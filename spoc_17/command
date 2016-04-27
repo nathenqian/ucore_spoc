@@ -1,1 +1,6 @@
-python x86.py -p looping-race-nolock.s -a bx=2 -t 2 -M 2000 -i 1 
+echo '原始的无锁版本：'
+python x86.py -p old-loop-nolock.s -a bx=2 -t 2 -M 2000 -i 2 -c
+echo '有锁版本，2条指令中断一次：'
+python x86.py -p looping-race-nolock.s -a bx=2 -t 2 -M 2000 -i 2 -c
+echo '有锁版本，4条指令中断一次：'
+python x86.py -p looping-race-nolock.s -a bx=2 -t 2 -M 2000 -i 4 -c

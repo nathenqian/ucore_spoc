@@ -3,7 +3,7 @@
 .main
 .top
 
-#获得锁
+# 进入临界区，获得锁
 .acquire
 mov  $1, %ax        
 xchg %ax, mutex     # atomic swap of 1 and mutex
@@ -14,17 +14,13 @@ jne  .acquire       # if not, try again
 mov 2000, %ax  # get the value at the address
 add $1, %ax    # increment it
 mov %ax, 2000  # store it back
+
 # leave
 mov $0, mutex
+
 # see if we're still looping
 sub  $1, %bx
 test $0, %bx
-jgt .top    
-#这里将ax放在cx，输出cx结果，答案中jgt .showresult的次数就是ax的值
-mov %ax, %cx
-.showresult
-sub $1, %cx
-test $0, %cx
-jgt .showresult
+jgt .top
 
 halt
