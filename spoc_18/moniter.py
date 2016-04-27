@@ -1,3 +1,4 @@
+# coding:utf-8
 from threading import Thread, Condition, Lock
 # output_list_lock = Lock()
 from time import sleep
@@ -27,8 +28,9 @@ def writer_read_first(_name, des):
     sleep(des[0])
     # start work
     output_list.append(("writer", name, "init"))
-    # sleep(0.1)
+    
     global lock, infor, toread, towrite
+
     lock.acquire()
     output_list.append(("writer", name, "lock"))
     while infor.isreading + infor.iswriting > 0:
@@ -86,7 +88,7 @@ def writer_write_first(_name, des):
     sleep(des[0])
     # start work
     output_list.append(("writer", name, "init"))
-    # sleep(0.1)
+    
     global lock, infor, toread, towrite
     lock.acquire()
     output_list.append(("writer", name, "lock"))
@@ -118,7 +120,6 @@ def reader_write_first(_name, des):
     sleep(des[0])
     # start work
     output_list.append(("reader", name, "init"))
-    # sleep(0.1)
 
     global lock, infor, toread, towrite
     lock.acquire()
@@ -151,8 +152,8 @@ else:
 
 print "simulating"
 
+# start time, last time
 reader = [
-#start time last time
     (0, 3),
     (1, 1),
     (2.5, 3)
@@ -182,11 +183,13 @@ for i in range(len(writer)):
     
 
 for i in threads:
-    i.setDaemon(True)
+    i.setDaemon(True)   # 设置为主线程结束时，把子线程杀死
     i.start()
 
 for i in threads:
-    i.join()
+    i.join()     # 等待全部线程结束
+
+# 全部线程结束后，输出运行过程追踪信息
 
 p = ""
 for i in range(len(reader)):
