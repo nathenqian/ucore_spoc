@@ -1,0 +1,39 @@
+reader_0            reader_1            reader_2            writer_0            writer_1            writer_2            
+init                
+acquire count mutex 
+acquire write mutex 
+release count mutex 
+start reading       
+                                                            init                
+                                                            acquire write mutex 
+                    init                
+                    acquire count mutex 
+                    release count mutex 
+                    start reading       
+                                                                                init                
+                                                                                acquire write mutex 
+                    end reading         
+                    acquire count mutex 
+                    release count mutex 
+                                                                                                    init                
+                                                                                                    acquire write mutex 
+                                        init                
+                                        acquire count mutex 
+                                        release count mutex 
+                                        start reading       
+end reading         
+acquire count mutex 
+release count mutex 
+                                        end reading         
+                                        acquire count mutex 
+                                        release write mutex 
+                                        release count mutex 
+                                                            start writing       
+                                                            end writing         
+                                                            release write mutext
+                                                                                start writing       
+                                                                                end writing         
+                                                                                release write mutext
+                                                                                                    start writing       
+                                                                                                    end writing         
+                                                                                                    release write mutext

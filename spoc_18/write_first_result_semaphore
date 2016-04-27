@@ -1,0 +1,61 @@
+reader_0            reader_1            reader_2            writer_0            writer_1            writer_2            
+init                
+acquire queue mutex 
+acquire count mutex 
+acquire write mutex 
+release count mutex 
+release queue mutex 
+start reading       
+                                                            init                
+                                                            acquire count mutex 
+                                                            acquire queue mutex 
+                                                            release count mutex 
+                                                            acquire write mutex 
+                    init                
+                    acquire queue mutex 
+                                                                                init                
+                                                                                acquire count mutex 
+                                                                                release count mutex 
+                                                                                acquire write mutex 
+                                                                                                    init                
+                                                                                                    acquire count mutex 
+                                                                                                    release count mutex 
+                                                                                                    acquire write mutex 
+                                        init                
+                                        acquire queue mutex 
+end reading         
+acquire count mutex 
+release write mutex 
+release count mutex 
+                                                            start writing       
+                                                            end writing         
+                                                            release write mutex 
+                                                            acquire count mutex 
+                                                            release count mutex 
+                                                                                start writing       
+                                                                                end writing         
+                                                                                release write mutex 
+                                                                                acquire count mutex 
+                                                                                release count mutex 
+                                                                                                    start writing       
+                                                                                                    end writing         
+                                                                                                    release write mutex 
+                                                                                                    acquire count mutex 
+                                                                                                    release queue mutex 
+                                                                                                    release count mutex 
+                    acquire count mutex 
+                    acquire write mutex 
+                    release count mutex 
+                    release queue mutex 
+                    start reading       
+                                        acquire count mutex 
+                                        release count mutex 
+                                        release queue mutex 
+                                        start reading       
+                    end reading         
+                    acquire count mutex 
+                    release count mutex 
+                                        end reading         
+                                        acquire count mutex 
+                                        release write mutex 
+                                        release count mutex 
