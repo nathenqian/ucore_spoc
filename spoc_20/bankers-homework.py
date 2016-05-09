@@ -1,3 +1,4 @@
+# coding:utf-8
 import os
 import random
 import numpy as np
@@ -40,21 +41,22 @@ class Bankers(object):
             res.append(self.RESOURCE[j] - tmp)
         return res
 
-    def ExecuteProcess(self,index):
+    def ExecuteProcess(self, index):
 
         #check if less avaliable than Request
-        # YOUR CODE, YOUR ID
+        # 2013011413 高思达, 2013011402 钱迪晨
+        
         #check END here
 
         #allocating what they need.
-        # YOUR CODE, YOUR ID
+        # 2013011413 高思达, 2013011402 钱迪晨
         #allocating END here
         pass
 
     def TempSafeCheckAfterRelease(self):
         #check if at least one request can be done after previous process done. not check whole sequances.
         #if every element of Requests can't accepted after previous process done, this mean it is not safe state
-        # YOUR CODE, YOU ID
+        # 2013011413 高思达, 2013011402 钱迪晨
         #check END here
         pass
 
@@ -130,7 +132,7 @@ def getmax():
         for i in range(len(total_resources)):
             randnum = random.random()
             remain_max = 0
-            if j >0:
+            if j > 0:
                 remain_max = total_resources[i]
                 for k in range(j):
                     remain_max = remain_max - res[k][i]
@@ -162,6 +164,7 @@ def getallocated():
     return res
 
 print "start here"
+'''
 # random seed
 seed = 2
 random.seed(seed)
@@ -172,52 +175,77 @@ resnum =  4
 # the max total value of resource
 restotalval = 30
 # the total resources list
-total_resources=[]
+total_resources = []
 # the total processes
-processes=[]
+processes = []
 # set the real total value of resource in total_resources
 for i in range(resnum):
-    total_resources.append((int)(restotalval*random.random()))
+    total_resources.append((int)(restotalval * random.random()))
 # init the Banker
 b = Bankers(total_resources)
-# get the max request values of resources from process
-max=getmax()
-# get the already gotted values of resources from process
-allocated=getallocated()
-# init need matrix, available vector
+# get the max request values of resources from process （随机生成一个合理的请求矩阵）
+max = getmax()
+# get the already gotted values of resources from process （随机生成一个已分配的矩阵）
+allocated = getallocated()
+# init need matrix, available vector  注册为算法相应数据结构的初始值
 b.SignProcesses(max, allocated)
 # print all theses matrixes
 b.print_matrixes()
 # executing Banker algorithm
-result=b.Execute()
+result = b.Execute()
 # show results
+if result:
+    print "SUCCESS proc lists ", processes
+else:
+    print "Failed"
+'''
+
+procnum = 3
+total_resources = [28, 28, 1, 2]
+processes = []
+b = Bankers(total_resources)
+
+max = [
+    [18, 16, 0, 0],
+    [4, 5, 0, 0],
+    [2, 2, 0, 1],
+]
+allocated = [
+    [17, 8, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+]
+b.SignProcesses(max, allocated)
+b.print_matrixes()
+result=b.Execute()
 if result:
     print "SUCCESS proc lists ",processes
 else:
     print "Failed"
 
-# total_resources = [6, 5, 7, 6]
-# processes=[]
-# b = Bankers(total_resources)
-#
-# max = [
-#     [3, 3, 2, 2],
-#     [1, 2, 3, 4],
-#     [1, 3, 5, 0],
-# ]
-# allocated = [
-#     [1, 2, 2, 1],
-#     [1, 0, 3, 3],
-#     [1, 2, 1, 0],
-# ]
-#
-# b.SignProcesses(max, allocated)
-# b.print_matrixes()
-# result=b.Execute()
-# if result:
-#     print "SUCCESS proc lists ",processes
-# else:
-#     print "Failed"
+'''
+total_resources = [6, 5, 7, 6]
+processes = []
+b = Bankers(total_resources)
+
+max = [
+    [3, 3, 2, 2],
+    [1, 2, 3, 4],
+    [1, 3, 5, 0],
+]
+allocated = [
+    [1, 2, 2, 1],
+    [1, 0, 3, 3],
+    [1, 2, 1, 0],
+]
+b.SignProcesses(max, allocated)
+b.print_matrixes()
+result=b.Execute()
+if result:
+    print "SUCCESS proc lists ",processes
+else:
+    print "Failed"
+'''
 #
 #
 # total_resources = [10, 10, 8, 5]
