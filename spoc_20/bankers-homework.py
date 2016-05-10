@@ -240,7 +240,7 @@ if result:
 else:
     print "Failed"
 
-'''
+
 total_resources = [6, 5, 7, 6]
 processes = []
 b = Bankers(total_resources)
@@ -262,28 +262,27 @@ if result:
     print "SUCCESS proc lists ",processes
 else:
     print "Failed"
-'''
-#
-#
-# total_resources = [10, 10, 8, 5]
-# processes=[]
-# b = Bankers(total_resources)
-# max = [
-#         [10, 8, 2,5],
-#         [6, 1, 3,1],
-#         [3, 1, 4,2],
-#         [5, 4, 2,1]
-#     ]
-# allocated = [
-#         [3, 0, 0,3],
-#         [1, 1, 2,0],
-#         [2, 1, 2,1],
-#         [0, 0, 2,0]
-#     ]
-# b.SignProcesses(max, allocated)
-# b.print_matrixes()
-# result=b.Execute()
-# if result:
-#     print "SUCCESS proc lists ",processes
-# else:
-#     print "Failed"
+
+procnum = 4
+total_resources = [10, 10, 8, 5]
+processes=[]
+b = Bankers(total_resources)
+max = [
+        [10, 8, 2,5],
+        [6, 1, 3,1],
+        [3, 1, 4,2],
+        [5, 4, 2,1]
+    ]
+allocated = [
+        [3, 0, 0,3],
+        [1, 1, 2,0],
+        [2, 1, 2,1],
+        [0, 0, 2,0]
+    ]
+b.SignProcesses(max, allocated)
+b.print_matrixes()
+result=b.Execute()
+if result:
+    print "SUCCESS proc lists ",processes
+else:
+    print "Failed"
