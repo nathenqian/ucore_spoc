@@ -28,7 +28,7 @@ class Bankers(object):
 
     def CalcNeed(self):
         #calc request by subtracting signed matrix from max matrix
-        return self.Difference(self.max,self.allocated)
+        return self.Difference(self.max, self.allocated)
 
     def CalcAvaliable(self):
         """Calc Avaliable Resource"""
@@ -45,20 +45,35 @@ class Bankers(object):
 
         #check if less avaliable than Request
         # 2013011413 高思达, 2013011402 钱迪晨
-        
+        for i in range(len(self.allocated[0])):
+            if (self.need[index][i] > self.avaliable[i]):
+                return False
         #check END here
 
-        #allocating what they need.
+        #allocating what they need. 只进行资源分配，即做好了执行的准备。但没有执行。
         # 2013011413 高思达, 2013011402 钱迪晨
+        for i in range(len(self.allocated[0])):
+            self.allocated[index][i] += self.need[index][i]
+            self.need[index][i] = 0
+        self.avaliable = self.CalcAvaliable()
+        # self.need = self.CalcNeed()
+        # 给出的CalcNeed实现十分简单，只能在初始化的时候用一次。后面分配完都得手动改成0.
+        return True
         #allocating END here
-        pass
 
     def TempSafeCheckAfterRelease(self):
         #check if at least one request can be done after previous process done. not check whole sequances.
         #if every element of Requests can't accepted after previous process done, this mean it is not safe state
         # 2013011413 高思达, 2013011402 钱迪晨
+        for i in range(len(self.allocated)):
+            valid_cnt = 0
+            for j in range(len(self.allocated[0])):
+                if self.need[i][j] <= self.avaliable[j]:
+                    valid_cnt += 1
+            if valid_cnt == len(self.allocated[0]):
+                return True
+        return False
         #check END here
-        pass
 
     def print_matrixes(self):
         print "_____________________________________________"
@@ -88,7 +103,7 @@ class Bankers(object):
                     print "Executing..."
                     print "Request: "
                     print self.need[i]
-                    #check if less avaliable than Request
+                    # check if less avaliable than Request
                     if self.ExecuteProcess(i):
                         print "Dispatching Done..."
 
@@ -102,6 +117,8 @@ class Bankers(object):
 
                         #check if at least one request can be done after previous process done. not check whole sequances.
                         #if every element of Requests can't accepted after previous process done, this mean it is not safe state
+                        # 任意时刻发现无法继续了，都能认为任意一种序列都不行。
+                        # 即，只要资源足够都可以立即执行，之后释放的资源可以让需求更大的人执行（这样做并不会对后面的进程有害）。
                         if not (self.TempSafeCheckAfterRelease()):
                             print "SAFE STATE: NOT SAFE - There are no sequances can avoid Deadlock"
                             return False
