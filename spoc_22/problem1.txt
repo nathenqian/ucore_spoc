@@ -1,0 +1,13 @@
+以open为例子
+file.c
+int file_open(char *path, uint32_t open_flags) {}
+在这个就是给最上层调用的接口，他会调用vfs_open，进行打开文件，在这里存储的是进程级别的文件信息。
+
+vfs_file.c
+vfs_open(char *path, uint32_t open_flags, struct inode **node_store) {}
+在这里会解析path，查看device名字和路径，如果为空，则新建文件。
+具体步骤为：查找到对应的device和路径的inode，如果为空则新建。
+在vfs的实现当中，使用的其实都是inode对应的operation，vfs只会调用vop_操作，进行调用。这样就真正的隐藏了下层不同文件系统的具体实现。
+
+
+
