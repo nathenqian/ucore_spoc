@@ -10,4 +10,4 @@ vfs_open(char *path, uint32_t open_flags, struct inode **node_store) {}
 在vfs的实现当中，使用的其实都是inode对应的operation，vfs只会调用vop_操作，进行调用。这样就真正的隐藏了下层不同文件系统的具体实现。
 
 
-
+接下来到sfs_inode.c里面的函数，比如sfs_load_inode，他会调用sfs_io.c里面的函数，这里面就是真正的io_device的函数了。
